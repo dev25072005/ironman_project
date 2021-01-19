@@ -3,6 +3,9 @@ var stone;
 var diamond;
 var spikes;
 var restart;
+var fireup;
+var firedown;
+var thanos;
 var score = 0;
 var gameState = "PLAY";
 
@@ -12,7 +15,10 @@ function preload() {
     stone = loadImage("images/stone.png");
     diamond = loadImage("images/diamond.png");
     spikes = loadImage("images/spikes.png");
-    restart_image = loadImage("images/restart.png");
+  restart_image = loadImage("images/restart.png");
+    fireup = loadImage("images/fireball upward.png");
+    firedown = loadImage("images/fireball downward.png");
+    thanos = loadImage("images/thanos.png");
 }
 
 function setup() {
@@ -23,9 +29,9 @@ function setup() {
     ironMan = createSprite(300, 200, 0, 0);
     ironMan.addImage(ironman);
     ironMan.scale = 0.2;
-    restart = createSprite(300, 300, 200, 80);
-    restart.addImage(restart_image);
-    restart.visible = false;
+  restart = createSprite(300,300,200,80);
+  restart.addImage(restart_image);
+  restart.visible = false;
     platformUp = createSprite(300, -20, 650, 50);
     platformUp.visible = false;
     platformDown = createSprite(300, 620, 650, 50);
@@ -37,6 +43,7 @@ function setup() {
     stoneGroup = new Group();
     pointGroup = new Group();
     pointGroup2 = new Group();
+    fireUp = new Group();
 }
 
 function draw() {
@@ -72,10 +79,24 @@ function draw() {
         // ironMan.setCollider("rectangle", 10, 0);
         createStone();
         createpoints();
+      
+      if(frameCount%30 === 0){
+      if(keyDown("space")){
+        ironpower();
+        
+       }}
+      
 
         for (var i = 0; i < stoneGroup.length; i++) {
             temp = stoneGroup.get(i);
             ironMan.collide(temp);
+        }
+      
+        for (var i = 0; i < fireUp.length; i++){
+          x = fireUp.get(i);
+          if(x.isTouching(platformUp)){
+            x.destroy();
+          }
         }
 
         if (ironMan.collide(platformDown) || score <= -10) {
@@ -108,14 +129,14 @@ function draw() {
         pointGroup.setVelocityYEach(0);
         pointGroup.setLifetimeEach(-1);
         pointGroup2.setVelocityYEach(0);
-        pointGroup2.setLifetimeEach(-1);
-        restart.visible = true;
-        if (mousePressedOver(restart)) {
-            restartGame();
-        }
+        pointGroup2.setLifetimeEach(-1);   
+      restart.visible = true;
+      if(mousePressedOver(restart)){
+    restartGame();
+  }
     }
-
-
+  
+  
 
     drawSprites();
 
@@ -163,19 +184,35 @@ function draw() {
             }
         }
     }
-
-    function restartGame() {
-        gameState = "PLAY";
-        if (gameState === "PLAY") {
-            stoneGroup.destroyEach();
-            pointGroup.destroyEach();
-            pointGroup2.destroyEach();
-            score = 0;
-            ironMan.x = 300;
-            ironMan.y = 200;
-            ironMan.visible = true;
-            bg.velocityY = -4;
-            restart.visible = false;
-        }
+  
+  function ironpower(){
+    var fireball;
+    fireball = createSprite(700,700,20,20);
+    fireball.x = ironMan.x;
+    fireball.y = ironMan.y;
+    fireball.addImage(fireup);
+    fireball.scale = 0.08;
+    fireball.velocityY = -8;
+    fireball.lifetime = 300;
+    if(fireball.isTouching(platformUp)){
+      fireball.destroy();
     }
+  
+    fireUp.add(fireball);
+  }
+  
+  function restartGame(){
+    gameState = "PLAY";
+    if(gameState === "PLAY"){
+      stoneGroup.destroyEach();
+      pointGroup.destroyEach();
+      pointGroup2.destroyEach();
+      score = 0;
+      ironMan.x = 300;
+      ironMan.y = 200;
+      ironMan.visible = true;
+      bg.velocityY = -4;
+      restart.visible = false;
+    }
+  }
 }
